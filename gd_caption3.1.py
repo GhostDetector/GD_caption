@@ -10,6 +10,7 @@ import sounddevice as sd
 import soundfile as sf
 import re
 
+#
 
 model = whisper.load_model('medium')
 fs = 41400
