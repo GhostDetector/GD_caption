@@ -1,7 +1,6 @@
 # GD_caption
 
-This app uses WhisperAI, an automatic speech recognition system developed by OpenAI. Whisper is licensed under the Apache License 2.0, which allows us to use it for free as long as we follow the terms of the license. You can find the source code of Whisper and the full license text at https://github.com/openai/whisper. We thank the OpenAI team for their amazing work and contribution to the speech recognition community.
-
+This app uses WhisperAI, an automatic speech recognition system developed by OpenAI. Whisper is licensed under the Apache License 2.0, which allows us to use it for free as long as we follow the terms of the license. You can find the source code of Whisper and the full license text at https://github.com/openai/whisper.
 Description:
 A faster way to manually caption images.
 
