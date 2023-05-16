@@ -2,23 +2,23 @@
 
 This app uses WhisperAI, an automatic speech recognition system developed by OpenAI. Whisper is licensed under the Apache License 2.0, which allows us to use it for free as long as we follow the terms of the license. You can find the source code of Whisper and the full license text at https://github.com/openai/whisper.
 
-##Description:
+## Description:
 
 A faster way to manually caption images.
 
-##Setup Instructions:
+## Setup Instructions:
 
  - Setup WhisperAI
  - Activate Environment
  - Run python script
 
-##Features:
+## Features:
 
 - Loads Image Folder
 - Loads Associated .txt file
 - Remove Image from directory
 
-##Shortcuts:
+## Shortcuts:
 
 - [Left] : Previous Image
 - [Right] : Next Image
