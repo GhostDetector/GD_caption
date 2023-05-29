@@ -85,11 +85,14 @@ class ImageAnnotationProgram:
         self.r0 = tk.Radiobutton(self.rad, text=" ", variable=self.quality, value=" ")
         self.r1 = tk.Radiobutton(self.rad, text="Masterpiece", variable=self.quality, value="Masterpiece")
         self.r2 = tk.Radiobutton(self.rad, text="High Quality", variable=self.quality, value="High Quality")
-        self.r3 = tk.Radiobutton(self.rad, text="Low Quality", variable=self.quality, value="Low Quality")
+        self.r3 = tk.Radiobutton(self.rad, text="Medium Quality", variable=self.quality, value="Medium Quality")
+        self.r4 = tk.Radiobutton(self.rad, text="Low Quality", variable=self.quality, value="Low Quality")
+        
         self.r0.pack(side='left')
         self.r1.pack(side='left')
         self.r2.pack(side='left')
         self.r3.pack(side='left')
+        self.r4.pack(side='left')
 
         self.end = tk.Frame(self.root)
         self.end.pack()
