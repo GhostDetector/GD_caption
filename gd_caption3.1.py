@@ -81,7 +81,7 @@ class ImageAnnotationProgram:
         self.rad = tk.Frame(self.root)
         self.rad.pack()
         self.quality = tk.StringVar()
-        self.quality.set(0)
+        self.quality.set(" ")
         self.r0 = tk.Radiobutton(self.rad, text=" ", variable=self.quality, value=" ")
         self.r1 = tk.Radiobutton(self.rad, text="Masterpiece", variable=self.quality, value="Masterpiece")
         self.r2 = tk.Radiobutton(self.rad, text="High Quality", variable=self.quality, value="High Quality")
@@ -190,7 +190,7 @@ class ImageAnnotationProgram:
         self.scoreLabel.configure(text=f"Score: {round(score,2)}")
         self.dimensions.configure(text=f'{photo_image.width()}x{photo_image.height()}')
         print("loading Image: {0} : {1} ".format(self.image_index,image_name))
-        self.quality.set(0)
+        self.quality.set(" ")
         self.clear_entry()
         self.load_caption()
         # Clear the entry widget
