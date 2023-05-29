@@ -9,8 +9,11 @@ import whisper
 import sounddevice as sd
 import soundfile as sf
 import re
+import clip
+from aesthetic_predictor import predict_aesthetic
+import torch
 
-#
+clip_model, preprocess = clip.load("ViT-B/32", device="cpu")
 
 model = whisper.load_model('medium')
 fs = 41400
@@ -40,6 +43,11 @@ class ImageAnnotationProgram:
 
         self.iteration_label = tk.Label(self.header)
         self.iteration_label.pack(side='right')
+        self.dimensions = tk.Label(self.header)
+        self.dimensions.pack(side='right')
+        self.scoreLabel = tk.Label(self.header)
+        self.scoreLabel.pack(side='right')
+        
 
         self.load_images_button = tk.Button(self.header, text="Load", command=self.load_images)
         self.load_images_button.pack(side='left')
@@ -91,7 +99,8 @@ class ImageAnnotationProgram:
         self.root.bind("<Right>", self.next_image)
         self.root.bind("<Return>", self.next_save)
         self.root.bind("<Left>", self.previous_image)
-
+        self.clip = tk.Button(self.end, text="Caption", command=self.get_aesthetic_score)
+        self.clip.pack(side='left')
 
     '''       
      self.undo_button = tk.Button(self.root, text="Undo_DEL", command=self.undo_delete)
@@ -149,8 +158,7 @@ class ImageAnnotationProgram:
             mb.showerror("Error", f"An error occurred while loading images: {e}")
         print(self.image_filenames)
 
-    def next_image(self, event=None):
-        self.image_index = (self.image_index + 1) % len(self.imagelist)
+    def updateinfo(self):
         image = self.imagelist[self.image_index]
         # Create a PhotoImage object
         photo_image = ImageTk.PhotoImage(image)
@@ -163,11 +171,22 @@ class ImageAnnotationProgram:
         image_name, image_ext = os.path.splitext(os.path.basename(image_path))
         self.image_name.configure(text=image_name)
         # Update the iteration label with the current iteration number and total
+        
         self.iteration_label.configure(text="Iteration: {} / {}".format(self.image_index + 1, len(self.imagelist)))
+        score = self.get_aesthetic_score(image).item()
+        self.scoreLabel.configure(text=f"Score: {round(score,2)}")
+        self.dimensions.configure(text=f'{photo_image.width()}x{photo_image.height()}')
         print("loading Image: {0} : {1} ".format(self.image_index,image_name))
+        
         self.clear_entry()
         self.load_caption()
         # Clear the entry widget
+    
+
+    def next_image(self, event=None):
+        self.image_index = (self.image_index + 1) % len(self.imagelist)
+        self.updateinfo()
+
 
 
     def next_save(self, event=None):
@@ -179,23 +198,7 @@ class ImageAnnotationProgram:
             return
 
         self.image_index = (self.image_index - 1) % len(self.imagelist)
-        image = self.imagelist[self.image_index]
-
-        # Create a PhotoImage object and update the image displayed in the label
-        photo_image = ImageTk.PhotoImage(image)
-        self.image_label.configure(image=photo_image)
-        self.image_label.image = photo_image
-
-        # Update the iteration label with the current iteration number and total
-        self.iteration_label.configure(text=f"Iteration: {self.image_index + 1} / {len(self.imagelist)}")
-
-        # Get the file name of the image and load the caption
-        image_path = self.image_filenames[self.image_index]
-        image_name, image_ext = os.path.splitext(os.path.basename(image_path))
-        self.image_name.configure(text=image_name)
-        self.clear_entry()
-        self.load_caption()
-        print(f"Loading Image: {self.image_index} : {image_name}")
+        self.updateinfo()
 
     def export_to_txt(self):
         caption = self.entry.get()
@@ -275,6 +278,22 @@ class ImageAnnotationProgram:
         text = re.sub(r'[^\w\s]', '', text)
         self.clear_entry()# clear the text field
         self.entry.insert(0, text)
+
+    # Define the function
+    def get_aesthetic_score(self,image):
+        # Preprocess the image
+        aesthetic_model = predict_aesthetic(image)
+        print(type(aesthetic_model))
+        '''image = preprocess(image).unsqueeze(0)
+        # Get the image features from CLIP
+        with torch.no_grad():
+            image_features = clip_model.encode_image(image)
+        # Get the score from aesthetic-predictor
+        score = aesthetic_model(image_features)
+        # Apply sigmoid function
+        score = torch.sigmoid(score).item()
+        # Return the score'''
+        return aesthetic_model
 
 '''    def undo_delete(self):
         if len(self.deleted_image_paths) > 0:
