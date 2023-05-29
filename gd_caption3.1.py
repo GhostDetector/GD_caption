@@ -76,6 +76,9 @@ class ImageAnnotationProgram:
         tk.Label(self.end, text=f"Enter Prompt Below {prompt}").pack()
         self.entry = tk.Entry(self.end, width=100)
         self.entry.pack()
+        tk.Label(self.end, text=f"Static Prompt").pack()
+        self.entrystatic = tk.Entry(self.end, width=100)
+        self.entrystatic.pack()
 
         self.clear_button = tk.Button(self.end, text="Clear", command=self.clear_entry)
         self.clear_button.pack()
@@ -196,13 +199,14 @@ class ImageAnnotationProgram:
 
     def export_to_txt(self):
         caption = self.entry.get()
+        caption2 = self.entrystatic.get()
         image_path = self.image_filenames[self.image_index]
         image_dir = self.get_dir()
         image_name = os.path.splitext(os.path.basename(image_path))[0]
         text_file = os.path.join(image_dir, f"{image_name}.txt")
         print(f'txt: {text_file}')
         with open(text_file, 'w') as f:
-            f.write(caption)
+            f.write(f'{caption} {caption2}')
         print(f'Save Caption: {caption}') 
         self.clear_entry()
 
