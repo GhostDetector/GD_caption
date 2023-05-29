@@ -18,6 +18,7 @@ clip_model, preprocess = clip.load("ViT-B/32", device="cpu")
 model = whisper.load_model('medium')
 fs = 41400
 
+
 class ImageAnnotationProgram:
     MAX_WIDTH = 512
     MAX_HEIGHT = 512
@@ -30,7 +31,7 @@ class ImageAnnotationProgram:
         self.imagelist = []
         self.deleted_image_paths = []
         self.create_widgets()
-        
+
 
     def create_widgets(self):
         self.header = tk.Frame(self.root)
@@ -77,6 +78,18 @@ class ImageAnnotationProgram:
 
         self.save_button = tk.Button(self.body2, text="Save Caption", command=self.export_to_txt)
         self.save_button.pack(side='left')
+        self.rad = tk.Frame(self.root)
+        self.rad.pack()
+        self.quality = tk.StringVar()
+        self.quality.set(0)
+        self.r0 = tk.Radiobutton(self.rad, text=" ", variable=self.quality, value=" ")
+        self.r1 = tk.Radiobutton(self.rad, text="Masterpiece", variable=self.quality, value="Masterpiece")
+        self.r2 = tk.Radiobutton(self.rad, text="High Quality", variable=self.quality, value="High Quality")
+        self.r3 = tk.Radiobutton(self.rad, text="Low Quality", variable=self.quality, value="Low Quality")
+        self.r0.pack(side='left')
+        self.r1.pack(side='left')
+        self.r2.pack(side='left')
+        self.r3.pack(side='left')
 
         self.end = tk.Frame(self.root)
         self.end.pack()
@@ -177,7 +190,7 @@ class ImageAnnotationProgram:
         self.scoreLabel.configure(text=f"Score: {round(score,2)}")
         self.dimensions.configure(text=f'{photo_image.width()}x{photo_image.height()}')
         print("loading Image: {0} : {1} ".format(self.image_index,image_name))
-        
+        self.quality.set(0)
         self.clear_entry()
         self.load_caption()
         # Clear the entry widget
@@ -208,8 +221,9 @@ class ImageAnnotationProgram:
         image_name = os.path.splitext(os.path.basename(image_path))[0]
         text_file = os.path.join(image_dir, f"{image_name}.txt")
         print(f'txt: {text_file}')
+        qual = self.quality.get()
         with open(text_file, 'w') as f:
-            f.write(f'{caption} {caption2}')
+            f.write(f'{caption} {caption2} {qual}')
         print(f'Save Caption: {caption}') 
         self.clear_entry()
 
@@ -283,16 +297,6 @@ class ImageAnnotationProgram:
     def get_aesthetic_score(self,image):
         # Preprocess the image
         aesthetic_model = predict_aesthetic(image)
-        print(type(aesthetic_model))
-        '''image = preprocess(image).unsqueeze(0)
-        # Get the image features from CLIP
-        with torch.no_grad():
-            image_features = clip_model.encode_image(image)
-        # Get the score from aesthetic-predictor
-        score = aesthetic_model(image_features)
-        # Apply sigmoid function
-        score = torch.sigmoid(score).item()
-        # Return the score'''
         return aesthetic_model
 
 '''    def undo_delete(self):
