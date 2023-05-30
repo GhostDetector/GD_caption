@@ -8,8 +8,9 @@ A faster way to manually caption images.
 
 ## Setup Instructions:
 
- - Setup WhisperAI
  - Activate Environment
+ - Install Whisper
+ - Install Clip
  - Run python script
 
 ## Features:

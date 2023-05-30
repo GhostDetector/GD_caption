@@ -2,16 +2,13 @@ import os
 import tkinter as tk
 from tkinter import messagebox as mb
 from PIL import Image, ImageTk
-from pathlib import Path
 from glob import glob
-import shutil
 import whisper
 import sounddevice as sd
 import soundfile as sf
 import re
 import clip
 from aesthetic_predictor import predict_aesthetic
-import torch
 
 clip_model, preprocess = clip.load("ViT-B/32", device="cpu")
 
@@ -133,7 +130,6 @@ class ImageAnnotationProgram:
         caption = self.get_dir()
         image_path = self.image_filenames[self.image_index]
         image_name, image_ext = os.path.splitext(os.path.basename(image_path))
-        image_directory = os.path.dirname(image_name)
         caption_file = os.path.join(caption, image_name + '.txt')
         try:
             with open(caption_file, 'r') as f:
@@ -176,9 +172,9 @@ class ImageAnnotationProgram:
 
     def updateinfo(self):
         image = self.imagelist[self.image_index]
-        # Create a PhotoImage object
+
         photo_image = ImageTk.PhotoImage(image)
-        # Update the image displayed in the label
+
         self.image_label.configure(image=photo_image)
         self.image_label.image = photo_image
         
@@ -186,8 +182,7 @@ class ImageAnnotationProgram:
         image_path = self.image_filenames[self.image_index]
         image_name, image_ext = os.path.splitext(os.path.basename(image_path))
         self.image_name.configure(text=image_name)
-        # Update the iteration label with the current iteration number and total
-        
+      
         self.iteration_label.configure(text="Iteration: {} / {}".format(self.image_index + 1, len(self.imagelist)))
         score = self.get_aesthetic_score(image).item()
         self.scoreLabel.configure(text=f"Score: {round(score,2)}")
@@ -196,8 +191,7 @@ class ImageAnnotationProgram:
         self.quality.set(" ")
         self.clear_entry()
         self.load_caption()
-        # Clear the entry widget
-    
+   
 
     def next_image(self, event=None):
         self.image_index = (self.image_index + 1) % len(self.imagelist)
@@ -241,7 +235,6 @@ class ImageAnnotationProgram:
         self.iteration_label.configure(text='')
         
     def delete_image(self):
-            # Get the current image path and index
         current_image_path = self.image_filenames[self.image_index]
         current_image_index = self.image_index
 
@@ -272,9 +265,8 @@ class ImageAnnotationProgram:
     def start_recording(self, event):
         if not self.is_recording:
             self.is_recording = True
-              # Sample rate
-            channels = 2  # Stereo
-            blocksize = 2048  # Set blocksize to 1024 frames
+            channels = 2 
+            blocksize = 2048 
             self.recording = sd.rec(int(5 * fs), samplerate=fs, channels=channels, blocksize=blocksize)
             print('Recording...')
         
@@ -288,17 +280,15 @@ class ImageAnnotationProgram:
             
     def transcribe_audio(self,recording):
         print("Transcribing...")
-        recording = model.transcribe("audio.wav") # transcribe the audio file
+        recording = model.transcribe("audio.wav")
         print("Done.")
-        text = recording["text"] # get the text
+        text = recording["text"]
         print(text)
         text = re.sub(r'[^\w\s]', '', text)
-        self.clear_entry()# clear the text field
+        self.clear_entry()
         self.entry.insert(0, text)
 
-    # Define the function
     def get_aesthetic_score(self,image):
-        # Preprocess the image
         aesthetic_model = predict_aesthetic(image)
         return aesthetic_model
 
@@ -323,6 +313,4 @@ class ImageAnnotationProgram:
 '''
 if __name__ == "__main__":
     app = ImageAnnotationProgram()
-    #app.root.bind("<Delete>", app.delete_image) 
-
     app.root.mainloop()
