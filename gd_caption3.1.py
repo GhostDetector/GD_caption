@@ -77,22 +77,32 @@ class ImageAnnotationProgram:
         self.save_button.pack(side='left')
         self.rad = tk.Frame(self.root)
         self.rad.pack()
-        self.quality = tk.StringVar()
-        self.quality.set(" ")
-        self.r0 = tk.Radiobutton(self.rad, text=" ", variable=self.quality, value=" ")
-        self.r1 = tk.Radiobutton(self.rad, text="Masterpiece", variable=self.quality, value="Masterpiece")
-        self.r2 = tk.Radiobutton(self.rad, text="High Quality", variable=self.quality, value="High Quality")
-        self.r3 = tk.Radiobutton(self.rad, text="Medium Quality", variable=self.quality, value="Medium Quality")
-        self.r4 = tk.Radiobutton(self.rad, text="Low Quality", variable=self.quality, value="Low Quality")
-        
-        self.r0.pack(side='left')
-        self.r1.pack(side='left')
-        self.r2.pack(side='left')
-        self.r3.pack(side='left')
-        self.r4.pack(side='left')
+        self.quality_selection = tk.StringVar()
+        self.quality_selection.set(" ")
 
+        self.quality=[' ','masterpiece','high quality','medium quality','low quality']
+        self.create_radio_buttons(self.rad, self.quality, self.quality_selection)
         self.end = tk.Frame(self.root)
         self.end.pack()
+        self.classes = [' ',"barbarian", "bard", "cleric", "druid", 
+        "fighter",'monk','paladin','ranger','rogue',
+        'sorcerer','warlock','wizard','artificer']
+
+        self.classes.sort()
+
+
+        self.class_selection = tk.StringVar()
+
+
+        self.class_selection.set(" ")  # Default selection
+
+
+        self.class_frame = tk.Frame(self.root)
+
+        self.create_radio_buttons(self.class_frame, self.classes, self.class_selection)
+
+        self.class_frame.pack()
+
         prompt = "[Mood][Media][Adjectives][Subject][Action][Style]"
         tk.Label(self.end, text=f"Enter Prompt Below {prompt}").pack()
         self.entry = tk.Entry(self.end, width=100)
@@ -115,10 +125,47 @@ class ImageAnnotationProgram:
         self.clip = tk.Button(self.end, text="Caption", command=self.get_aesthetic_score)
         self.clip.pack(side='left')
 
+#######
+
+
+        self.classes_entry = tk.Entry(self.root, width=64)
+        self.classes_entry.pack()
+
+        self.update_classes_button = tk.Button(self.root, text="Update Classes", command=self.update_classes)
+        self.update_classes_button.pack()
     '''       
      self.undo_button = tk.Button(self.root, text="Undo_DEL", command=self.undo_delete)
         self.undo_button.pack(pady=5)
     '''
+    def update_radio_buttons(self, frame, options, variable):
+        variable.set(" ")  # Reset the selection
+        radio_buttons = frame.grid_slaves()  # Get the existing radio buttons
+
+        # Remove the existing radio buttons
+        for button in radio_buttons:
+            button.grid_forget()
+
+        # Create new radio buttons with the updated options
+        num_columns = 7  # Number of columns for grid layout
+        for i, option in enumerate(options):
+            radio_button = tk.Radiobutton(frame, text=option, variable=variable, value=option, bg=frame["bg"])
+            radio_button.grid(row=i // num_columns, column=i % num_columns, sticky='w')
+
+
+    def update_classes(self):
+        # Get the classes from the entry label, split by commas
+        classes_text = self.classes_entry.get()
+        new_classes = [' '] + [class_name.strip() for class_name in classes_text.split(' ')]
+
+        # Call the update_radio_buttons method
+        self.update_radio_buttons(self.class_frame, new_classes, self.class_selection)
+
+    def create_radio_buttons(self, frame, options, variable):
+        num_columns = 7  # Number of columns for grid layout
+        for i, option in enumerate(options):
+            radio_button = tk.Radiobutton(frame, text=option, variable=variable, value=option, bg=frame["bg"])
+            radio_button.grid(row=i // num_columns, column=i % num_columns, sticky='w')
+
 
     def get_dir(self):
         return self.entrylabel.get()
@@ -188,7 +235,7 @@ class ImageAnnotationProgram:
         self.scoreLabel.configure(text=f"Score: {round(score,2)}")
         self.dimensions.configure(text=f'{photo_image.width()}x{photo_image.height()}')
         print("loading Image: {0} : {1} ".format(self.image_index,image_name))
-        self.quality.set(" ")
+        #self.quality.set(" ")
         self.clear_entry()
         self.load_caption()
    
@@ -218,7 +265,7 @@ class ImageAnnotationProgram:
         image_name = os.path.splitext(os.path.basename(image_path))[0]
         text_file = os.path.join(image_dir, f"{image_name}.txt")
         print(f'txt: {text_file}')
-        qual = self.quality.get()
+        qual = self.quality_selection.get()
         with open(text_file, 'w') as f:
             f.write(f'{caption} {caption2} {qual}')
         print(f'Save Caption: {caption}') 
